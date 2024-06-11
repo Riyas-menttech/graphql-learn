@@ -11,14 +11,14 @@ import { createServer } from "http";
 async function startServer() {
     const port = 8000;
     const app = express();
-    const httpServer = createServer();
     const schema = makeExecutableSchema({ typeDefs, resolvers });
     const server = new ApolloServer({ schema });
     app.use(bodyParser.json());
     app.use(cors());
     await server.start();
     app.use("/graphql", expressMiddleware(server));
-    //Setup subscription websocket
+    const httpServer = createServer(app);
+    //Setup subscription websocket for handling graphql
     SubscriptionServer.create({
         execute,
         subscribe,
@@ -28,7 +28,7 @@ async function startServer() {
         path: "/graphql",
     });
     // Start the HTTP server
-    app.listen(8000, () => {
+    httpServer.listen(port, () => {
         console.log("Server started on http://localhost:8000");
         console.log("Subscriptions ready at ws://localhost:8000/graphql");
     });

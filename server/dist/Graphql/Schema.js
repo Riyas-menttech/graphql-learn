@@ -1,9 +1,15 @@
 import axios from "axios";
 import { PubSub } from 'graphql-subscriptions';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 const pubsub = new PubSub();
 const TODO_ADDED = 'TODO_ADDED';
 const TODO_UPDATED = 'TODO_UPDATED';
 const TODO_DELETED = 'TODO_DELETED';
+const EMAIL = process.env.EMAIL;
+const PASSWORD = process.env.PASSWORD;
+const JWT_SECRET = process.env.JWT_SECRET;
 export const typeDefs = `
 type Geo {
         lat:String,
@@ -25,7 +31,7 @@ type User {
      
 }
 type Todo {
-id:ID!
+id:ID
 userId:String!
 title:String!
 completed:Boolean,
@@ -36,10 +42,14 @@ getTodos:[Todo],
 getUsers:[User],
 getSingleUser(id:ID!):User
 }
+type AuthPaylod { 
+token:String
+}
 type Mutation {
-addTodo(userId: String!, title: String!, completed: Boolean):Todo
+addTodo(userId: String, title: String!, completed: Boolean):Todo
 deleteTodo(id:ID!):Todo
 updateTodo(id: ID!, userId: String, title: String, completed: Boolean): Todo
+loginUser(email:String,password:String!):AuthPaylod
 }
 type Subscription {
 todoAdded:Todo
@@ -65,8 +75,8 @@ export const resolvers = {
         },
     },
     Mutation: {
-        addTodo: async (_, { userId, title, completed }) => {
-            const newTodo = { userId, title, completed };
+        addTodo: async (_, { title, completed }) => {
+            const newTodo = { title, completed };
             const response = await axios.post('https://jsonplaceholder.typicode.com/todos', newTodo);
             const addedTodo = response.data;
             pubsub.publish(TODO_ADDED, { todoAdded: addedTodo });
@@ -84,6 +94,16 @@ export const resolvers = {
             const deletedTodo = { id };
             pubsub.publish(TODO_DELETED, { todoDeleted: deletedTodo });
             return deletedTodo;
+        },
+        loginUser: async (_, { email, password }) => {
+            console.log(EMAIL, typeof (password), PASSWORD, 'partials');
+            if (EMAIL == email && PASSWORD == password) {
+                const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: '1h' });
+                return { token };
+            }
+            else {
+                throw new Error('Invalid credentials');
+            }
         }
     },
     Subscription: {
