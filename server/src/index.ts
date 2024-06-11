@@ -9,11 +9,13 @@ import { SubscriptionServer } from "subscriptions-transport-ws";
 import { resolvers, typeDefs } from "./Graphql/Schema.js";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { createServer } from "http";
+import {graphqlHTTP} from 'express-graphql'
 
 async function startServer() {
   const port = 8000;
   const app = express();
-  const schema = makeExecutableSchema({ typeDefs, resolvers });
+
+  const schema  = makeExecutableSchema({ typeDefs,resolvers})
   const server = new ApolloServer({ schema });
 
   app.use(bodyParser.json());
@@ -21,7 +23,16 @@ async function startServer() {
 
   await server.start();
 
-  app.use("/graphql", expressMiddleware(server));
+//   app.use("/graphql", expressMiddleware(server));
+app.use('/graphql',graphqlHTTP((req)=>{
+  return {
+    schema,
+    graphiql:{headerEditorEnabled:true},
+    context:req.headers.authorization
+  }
+})
+)
+  
 
   const httpServer = createServer(app);
 

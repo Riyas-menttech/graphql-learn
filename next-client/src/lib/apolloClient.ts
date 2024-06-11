@@ -1,14 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { ApolloClient, InMemoryCache,HttpLink } from '@apollo/client';
+import { ApolloNextAppProvider } from "@apollo/experimental-nextjs-app-support";
+
+import { ApolloClient, InMemoryCache,HttpLink, ApolloProvider, ApolloConsumer } from '@apollo/client';
 // import  {WebSocketLink} from '@apollo/client/link/ws';
 // import { getMainDefinition } from '@apollo/client/utilities';
 import { setContext } from '@apollo/client/link/context';
 
 
+
 // HTTP connection to the API
 const httpLink = new HttpLink({
-    uri:import.meta.env.VITE_GRAPHQL_HTTP || 'http://localhost:8000/graphql'
+    uri:'http://localhost:8000/graphql'
   });
+ 
 //Websocket link for subscriptions
 // const wsLink : any = typeof window !== 'undefined'? new WebSocketLink({
 //     uri: import.meta.env.VITE_GRAPHQL_WS || 'ws://localhost:8000/graphql', // Your WebSocket server URL
@@ -30,6 +33,9 @@ const httpLink = new HttpLink({
 //   ) : httpLink;
 
 
+export function ApolloWrapper({ children }: React.PropsWithChildren) {
+
+
   const authLink = setContext((_, { headers }) => {
     // Get the authentication token from local storage if it exists
     const sampleToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJpeWF6QG1lbnQudGVjaCIsImlhdCI6MTcxODEwNjcyOSwiZXhwIjoxNzE4MTkzMTI5fQ.Xcji8s1lfWdFfKNYLkQgnDySolV8ucPCoxlJe14ungE'
@@ -42,10 +48,14 @@ const httpLink = new HttpLink({
       },
     };
   });
-
+ 
 const client = new ApolloClient({
   link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
 });
+  return (
 
-export default client;
+  // <ApolloClient ></ApolloClient>
+  );
+}
+

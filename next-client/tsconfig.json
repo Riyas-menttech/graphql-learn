@@ -21,6 +21,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/lib/apolloClient.jsa", "src/lib/apolloClient.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/lib/apolloClient.jsa", "src/lib/apolloClient.ts"],
   "exclude": ["node_modules"]
 }

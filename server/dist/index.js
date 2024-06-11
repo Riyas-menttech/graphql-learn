@@ -1,5 +1,4 @@
 import { ApolloServer } from "@apollo/server";
-import { expressMiddleware } from "@apollo/server/express4";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -8,6 +7,7 @@ import { SubscriptionServer } from "subscriptions-transport-ws";
 import { resolvers, typeDefs } from "./Graphql/Schema.js";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { createServer } from "http";
+import { graphqlHTTP } from 'express-graphql';
 async function startServer() {
     const port = 8000;
     const app = express();
@@ -16,7 +16,14 @@ async function startServer() {
     app.use(bodyParser.json());
     app.use(cors());
     await server.start();
-    app.use("/graphql", expressMiddleware(server));
+    //   app.use("/graphql", expressMiddleware(server));
+    app.use('/graphql', graphqlHTTP((req) => {
+        return {
+            schema,
+            graphiql: { headerEditorEnabled: true },
+            context: req.headers.authorization
+        };
+    }));
     const httpServer = createServer(app);
     //Setup subscription websocket for handling graphql
     SubscriptionServer.create({

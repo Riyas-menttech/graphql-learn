@@ -57,14 +57,35 @@ todoUpdated:Todo
 todoDeleted:Todo
 }
 `;
+const getUserFromToken = (token) => {
+    try {
+        const newToken = token.slice(7);
+        if (newToken) {
+            console.log('inside', newToken);
+            let user = jwt.verify(newToken, JWT_SECRET);
+            return user;
+        }
+        return null;
+    }
+    catch (err) {
+        console.log(err);
+    }
+};
 export const resolvers = {
     Todo: {
         user: async (todo) => (await axios.get(`https://jsonplaceholder.typicode.com/users/${todo.userId}`)).data
     },
     Query: {
-        getTodos: async () => {
-            return (await axios.get("https://jsonplaceholder.typicode.com/todos"))
-                .data;
+        getTodos: async (parent, args, context) => {
+            const user = getUserFromToken(context);
+            console.log(user, 'user-===<<ishere');
+            if (user) {
+                return (await axios.get("https://jsonplaceholder.typicode.com/todos"))
+                    .data;
+            }
+            else {
+                return null;
+            }
         },
         getUsers: async () => {
             return (await axios.get("https://jsonplaceholder.typicode.com/users"))
@@ -95,16 +116,15 @@ export const resolvers = {
             pubsub.publish(TODO_DELETED, { todoDeleted: deletedTodo });
             return deletedTodo;
         },
-        loginUser: async (_, { email, password }) => {
-            console.log(EMAIL, typeof (password), PASSWORD, 'partials');
+        loginUser: (_, { email, password }, headers) => {
             if (EMAIL == email && PASSWORD == password) {
-                const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: '1h' });
+                const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: '24h' });
                 return { token };
             }
             else {
                 throw new Error('Invalid credentials');
             }
-        }
+        },
     },
     Subscription: {
         todoAdded: {

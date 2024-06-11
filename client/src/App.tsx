@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import './App.css'
-import { useMutation, useQuery, useSubscription } from '@apollo/client';
-import { ADD_TODO, FETCH_TODOS, TODO_ADDED } from './lib/graphql';
+import { useMutation, useQuery } from '@apollo/client';
+import { ADD_TODO, FETCH_TODOS } from './lib/graphql';
 import { useState } from 'react';
 
 
 function App() {
   const {data ,loading,error} = useQuery(FETCH_TODOS);
   const [addTodo] = useMutation(ADD_TODO);
-  const {data:Subscriptiondata} = useSubscription(TODO_ADDED);
 
   const [title, setTitle] = useState('');
   const [userId, setUserId] = useState('');
@@ -25,7 +24,7 @@ function App() {
 
   if(loading) return <h1>Loading...</h1>
 
-  const todos = Subscriptiondata ? [Subscriptiondata.todoAdded,...data.getTodos] : data.getTodos;
+  const todos =data.getTodos;
 
   return (
     <div>
