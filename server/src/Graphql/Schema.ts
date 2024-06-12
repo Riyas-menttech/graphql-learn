@@ -2,6 +2,7 @@ import axios from "axios";
 import {PubSub} from 'graphql-subscriptions';
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv';
+import { Data } from "../Data.js";
 dotenv.config()
 
 const pubsub = new PubSub();

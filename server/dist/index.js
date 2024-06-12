@@ -7,7 +7,7 @@ import { SubscriptionServer } from "subscriptions-transport-ws";
 import { resolvers, typeDefs } from "./Graphql/Schema.js";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { createServer } from "http";
-import { graphqlHTTP } from 'express-graphql';
+import { graphqlHTTP } from "express-graphql";
 async function startServer() {
     const port = 8000;
     const app = express();
@@ -17,11 +17,11 @@ async function startServer() {
     app.use(cors());
     await server.start();
     //   app.use("/graphql", expressMiddleware(server));
-    app.use('/graphql', graphqlHTTP((req) => {
+    app.use("/graphql", graphqlHTTP((req) => {
         return {
             schema,
             graphiql: { headerEditorEnabled: true },
-            context: req.headers.authorization
+            context: req.headers.authorization,
         };
     }));
     const httpServer = createServer(app);

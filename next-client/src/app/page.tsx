@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
-import { ADD_TODO, FETCH_TODOS, TODO_ADDED } from '../lib/graphql';
+import { ADD_TODO, FETCH_TODOS, TODO_ADDED } from './lib/graphql';
 import { useState } from 'react';
 
 

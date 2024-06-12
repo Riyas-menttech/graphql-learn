@@ -1,9 +1,9 @@
-import { ApolloNextAppProvider } from "@apollo/experimental-nextjs-app-support";
+import { ApolloNextAppProvider } from '@apollo/experimental-nextjs-app-support'
 
 import { ApolloClient, InMemoryCache,HttpLink, ApolloProvider, ApolloConsumer } from '@apollo/client';
 // import  {WebSocketLink} from '@apollo/client/link/ws';
 // import { getMainDefinition } from '@apollo/client/utilities';
-import { setContext } from '@apollo/client/link/context';
+import { setContext } from '@apollo/client/link/context'
 
 
 
@@ -32,10 +32,7 @@ const httpLink = new HttpLink({
 //     httpLink
 //   ) : httpLink;
 
-
-export function ApolloWrapper({ children }: React.PropsWithChildren) {
-
-
+function makeClient () {
   const authLink = setContext((_, { headers }) => {
     // Get the authentication token from local storage if it exists
     const sampleToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJpeWF6QG1lbnQudGVjaCIsImlhdCI6MTcxODEwNjcyOSwiZXhwIjoxNzE4MTkzMTI5fQ.Xcji8s1lfWdFfKNYLkQgnDySolV8ucPCoxlJe14ungE'
@@ -49,13 +46,18 @@ export function ApolloWrapper({ children }: React.PropsWithChildren) {
     };
   });
  
-const client = new ApolloClient({
+const client : any = new ApolloClient({
   link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
 });
-  return (
+return client
+}
 
-  // <ApolloClient ></ApolloClient>
+
+export function ApolloWrapper({ children }: React.PropsWithChildren) {
+
+  return (
+   <ApolloNextAppProvider makeClient={makeClient}>{children}</ApolloNextAppProvider>
   );
 }
 
