@@ -58,7 +58,7 @@ type Query {
 getTodos:[Todo],
 getUsers:[User],
 getSingleUser:[Orm],
-getProducts:[Product]
+getProducts:Product
 }
 type AuthPaylod { 
 token:String
@@ -113,8 +113,11 @@ export const resolvers = {
     },
     getProducts: async (parent, args, context) => {
       const user = getUserFromToken(context);
+      
       if (user) {
-        let products = await AppDataSource.manager.find(Product);
+        // let products = await AppDataSource.manager.find(Product);
+        let productRepository = await AppDataSource.getRepository(Product)
+        let products = await productRepository.findOneBy({id:1})
         return products;
       }
       return null;

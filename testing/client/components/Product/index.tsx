@@ -44,11 +44,11 @@ function Product() {
       />
       <button onClick={handleAddTodo}>Add Todo</button> */}
       <ul>
-        {todos?.map((todo:any) => (
-          <li key={todo.id}>
-            {todo.id} - {todo.name } + {todo.price}
+        {/* {todos?.map((todo:any) => ( */}
+          <li >
+            {todos.id} - {todos.name } + {todos.price}
           </li>
-        ))}
+        {/* ))} */}
       </ul>
     </div>
   );
