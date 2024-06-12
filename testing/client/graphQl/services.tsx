@@ -54,7 +54,45 @@ export const FETCH_TODOS = gql`
       }
     }
   }`
-
+  export const FETCH_USERS = gql`
+  query getUsers {
+  getUsers {
+   id
+    name,
+    username,
+    email,
+    address{
+     street,
+      suite,
+      city,
+      zipcode,
+      geo {
+      lat,
+        lng
+      }
+    }
+  }
+  }
+  `
+export const FETCH_USERS_ORM = gql`
+query getSingleUser {
+getSingleUser {
+ id
+  firstName
+  lastName
+   age
+}
+}
+`
+export const FETCH_Products_ORM = gql`
+query getProducts {
+getProducts {
+id
+name
+price
+}
+ }
+`
 
 export const ADD_TODO = gql`
    mutation AddTodo($userId:String,$title:String){

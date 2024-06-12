@@ -2,6 +2,9 @@ import axios from "axios";
 import { PubSub } from 'graphql-subscriptions';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { AppDataSource } from "../orm/ormconfig.js";
+import { User } from "../orm/entity/user-entity.js";
+import { Product } from "../orm/entity/product-entity.js";
 dotenv.config();
 const pubsub = new PubSub();
 const TODO_ADDED = 'TODO_ADDED';
@@ -37,10 +40,22 @@ title:String!
 completed:Boolean,
 user:User
 }
+type Orm {
+ id: String
+  firstName:String
+  lastName:String
+   age: String
+}
+type Product {
+id:String
+name:String
+price:String
+}
 type Query {  
 getTodos:[Todo],
 getUsers:[User],
-getSingleUser(id:ID!):User
+getSingleUser:[Orm],
+getProducts:[Product]
 }
 type AuthPaylod { 
 token:String
@@ -87,12 +102,31 @@ export const resolvers = {
                 return null;
             }
         },
-        getUsers: async () => {
-            return (await axios.get("https://jsonplaceholder.typicode.com/users"))
-                .data;
+        getProducts: async (parent, args, context) => {
+            const user = getUserFromToken(context);
+            if (user) {
+                let products = await AppDataSource.manager.find(Product);
+                return products;
+            }
+            return null;
         },
-        getSingleUser: async (_, { id }) => {
-            return (await axios.get(`https://jsonplaceholder.typicode.com/users/${id}`)).data;
+        getUsers: async (parent, args, context) => {
+            const user = getUserFromToken(context);
+            console.log(user, 'usergettingevreywhgere');
+            if (user) {
+                return (await axios.get("https://jsonplaceholder.typicode.com/users"))
+                    .data;
+            }
+            else {
+                return null;
+            }
+        },
+        getSingleUser: async () => {
+            let user = await AppDataSource.manager.find(User);
+            return user;
+            // return (
+            //   await axios.get(`https://jsonplaceholder.typicode.com/users/${id}`)
+            // ).data;
         },
     },
     Mutation: {

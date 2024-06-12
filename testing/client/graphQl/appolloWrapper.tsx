@@ -23,7 +23,7 @@ function makeClient() {
 
   const authLink = setContext((_, { headers }) => {
     // Get the authentication token from local storage if it exists
-    const sampleToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJpeWF6QG1lbnQudGVjaCIsImlhdCI6MTcxODEwNjcyOSwiZXhwIjoxNzE4MTkzMTI5fQ.Xcji8s1lfWdFfKNYLkQgnDySolV8ucPCoxlJe14ungE';
+    const sampleToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJpeWF6QG1lbnQudGVjaCIsImlhdCI6MTcxODE5NDM1OSwiZXhwIjoxNzE4MjgwNzU5fQ.sCa1nJ51_v3afDihwmwvoXsSunUZFMBWo-je14nKstI';
     localStorage.setItem('token', sampleToken);
     const newToken = localStorage.getItem('token');
     return {

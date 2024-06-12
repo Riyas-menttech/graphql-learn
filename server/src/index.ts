@@ -10,6 +10,10 @@ import { resolvers, typeDefs } from "./Graphql/Schema.js";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { createServer } from "http";
 import { graphqlHTTP } from "express-graphql";
+import { AppDataSource } from "./orm/ormconfig.js";
+import 'reflect-metadata';
+import { User } from './orm/entity/user-entity.js';
+import { Product } from "./orm/entity/product-entity.js";
 
 async function startServer() {
   const port = 8000;
@@ -24,6 +28,8 @@ async function startServer() {
   await server.start();
 
   //   app.use("/graphql", expressMiddleware(server));
+
+  //query for header authorization
   app.use(
     "/graphql",
     graphqlHTTP((req) => {
@@ -43,14 +49,41 @@ async function startServer() {
       execute,
       subscribe,
       schema,
-    },
+    }, 
     {
       server: httpServer,
       path: "/graphql",
     }
   );
+
+AppDataSource.initialize().then(async()=>{
+    console.log('Data Source has been initialized!');
+     // Create a new user
+     const user = new User();
+     user.firstName = 'Riya';
+     user.lastName = 'S';
+     user.age = 25;
+
+     const  product = new Product();
+     product.name = 'apple';
+     product.price = 100000;
+
+     await AppDataSource.manager.save(product);
+
+     await AppDataSource.manager.save(user);
+     console.log('User has been saved:', user);
+ 
+     //Retireve
+     const users = await AppDataSource.manager.find(User);
+     const products = await AppDataSource.manager.find(Product);
+     console.log('All producrs:', products);
+     console.log('All users:', users);
+
+}).catch((err)=>console.log('Error Occured',err))
   // Start the HTTP server
-  httpServer.listen(port, () => {
+  httpServer.listen(port, async() => {
+
+    await AppDataSource;
     console.log("Server started on http://localhost:8000");
     console.log("Subscriptions ready at ws://localhost:8000/graphql");
   });

@@ -3,6 +3,9 @@ import {PubSub} from 'graphql-subscriptions';
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv';
 import { Data } from "../Data.js";
+import { AppDataSource } from "../orm/ormconfig.js";
+import { User } from "../orm/entity/user-entity.js";
+import { Product } from "../orm/entity/product-entity.js";
 dotenv.config()
 
 const pubsub = new PubSub();
@@ -40,10 +43,22 @@ title:String!
 completed:Boolean,
 user:User
 }
+type Orm {
+ id: String
+  firstName:String
+  lastName:String
+   age: String
+}
+type Product {
+id:String
+name:String
+price:String
+}
 type Query {  
 getTodos:[Todo],
 getUsers:[User],
-getSingleUser(id:ID!):User
+getSingleUser:[Orm],
+getProducts:[Product]
 }
 type AuthPaylod { 
 token:String
@@ -85,7 +100,7 @@ export const resolvers = {
     },
   Query: {
     getTodos: async (parent,args,context) => {
-        const user = getUserFromToken(context)
+        const user = getUserFromToken(context);
    console.log(user,'user-===<<ishere');
       if(user){
         return (await axios.get("https://jsonplaceholder.typicode.com/todos"))
@@ -96,14 +111,31 @@ export const resolvers = {
        
      
     },
-    getUsers: async () => {
-      return (await axios.get("https://jsonplaceholder.typicode.com/users"))
-        .data;
+    getProducts:async(parent,args,context)=>{
+      const user =getUserFromToken(context)
+      if(user){
+        let products = await AppDataSource.manager.find(Product);
+      return products
+      }
+      return null;
     },
-    getSingleUser: async (_, { id }) => {
-      return (
-        await axios.get(`https://jsonplaceholder.typicode.com/users/${id}`)
-      ).data;
+    getUsers: async (parent,args,context) => {
+      const user = getUserFromToken(context);
+      console.log(user,'usergettingevreywhgere');
+      if(user){
+        return (await axios.get("https://jsonplaceholder.typicode.com/users"))
+        .data;
+      }else{
+        return null
+      }
+    },
+    getSingleUser: async () => {
+      let user = await AppDataSource.manager.find(User)
+      
+      return user;
+      // return (
+      //   await axios.get(`https://jsonplaceholder.typicode.com/users/${id}`)
+      // ).data;
     },
   },
   Mutation :{
