@@ -12,10 +12,10 @@ import {
   NextSSRInMemoryCache,
   SSRMultipartLink,
 } from "@apollo/experimental-nextjs-app-support/ssr";
-import { setContext } from '@apollo/client/link/context';
+import { setContext } from "@apollo/client/link/context";
 
 function makeClient() {
-  const URL = 'http://localhost:8000/graphql';
+  const URL = "http://localhost:8000/graphql";
 
   const httpLink = new HttpLink({
     uri: URL,
@@ -23,13 +23,14 @@ function makeClient() {
 
   const authLink = setContext((_, { headers }) => {
     // Get the authentication token from local storage if it exists
-    const sampleToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJpeWF6QG1lbnQudGVjaCIsImlhdCI6MTcxODE5NDM1OSwiZXhwIjoxNzE4MjgwNzU5fQ.sCa1nJ51_v3afDihwmwvoXsSunUZFMBWo-je14nKstI';
-    localStorage.setItem('token', sampleToken);
-    const newToken = localStorage.getItem('token');
+    const sampleToken =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJpeWF6QG1lbnQudGVjaCIsImlhdCI6MTcxODE5NDM1OSwiZXhwIjoxNzE4MjgwNzU5fQ.sCa1nJ51_v3afDihwmwvoXsSunUZFMBWo-je14nKstI";
+    localStorage.setItem("token", sampleToken);
+    const newToken = localStorage.getItem("token");
     return {
       headers: {
         ...headers,
-        authorization: newToken ? `Bearer ${newToken}` : '',
+        authorization: newToken ? `Bearer ${newToken}` : "",
       },
     };
   });
