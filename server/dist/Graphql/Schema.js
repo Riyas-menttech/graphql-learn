@@ -1,15 +1,15 @@
 import axios from "axios";
-import { PubSub } from 'graphql-subscriptions';
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+import { PubSub } from "graphql-subscriptions";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 import { AppDataSource } from "../orm/ormconfig.js";
 import { User } from "../orm/entity/user-entity.js";
 import { Product } from "../orm/entity/product-entity.js";
 dotenv.config();
 const pubsub = new PubSub();
-const TODO_ADDED = 'TODO_ADDED';
-const TODO_UPDATED = 'TODO_UPDATED';
-const TODO_DELETED = 'TODO_DELETED';
+const TODO_ADDED = "TODO_ADDED";
+const TODO_UPDATED = "TODO_UPDATED";
+const TODO_DELETED = "TODO_DELETED";
 const EMAIL = process.env.EMAIL;
 const PASSWORD = process.env.PASSWORD;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -76,7 +76,7 @@ const getUserFromToken = (token) => {
     try {
         const newToken = token.slice(7);
         if (newToken) {
-            console.log('inside', newToken);
+            console.log("inside", newToken);
             let user = jwt.verify(newToken, JWT_SECRET);
             return user;
         }
@@ -88,12 +88,12 @@ const getUserFromToken = (token) => {
 };
 export const resolvers = {
     Todo: {
-        user: async (todo) => (await axios.get(`https://jsonplaceholder.typicode.com/users/${todo.userId}`)).data
+        user: async (todo) => (await axios.get(`https://jsonplaceholder.typicode.com/users/${todo.userId}`)).data,
     },
     Query: {
         getTodos: async (parent, args, context) => {
             const user = getUserFromToken(context);
-            console.log(user, 'user-===<<ishere');
+            console.log(user, "user-===<<ishere");
             if (user) {
                 return (await axios.get("https://jsonplaceholder.typicode.com/todos"))
                     .data;
@@ -112,7 +112,7 @@ export const resolvers = {
         },
         getUsers: async (parent, args, context) => {
             const user = getUserFromToken(context);
-            console.log(user, 'usergettingevreywhgere');
+            console.log(user, "usergettingevreywhgere");
             if (user) {
                 return (await axios.get("https://jsonplaceholder.typicode.com/users"))
                     .data;
@@ -132,7 +132,7 @@ export const resolvers = {
     Mutation: {
         addTodo: async (_, { title, completed }) => {
             const newTodo = { title, completed };
-            const response = await axios.post('https://jsonplaceholder.typicode.com/todos', newTodo);
+            const response = await axios.post("https://jsonplaceholder.typicode.com/todos", newTodo);
             const addedTodo = response.data;
             pubsub.publish(TODO_ADDED, { todoAdded: addedTodo });
             return addedTodo;
@@ -152,23 +152,23 @@ export const resolvers = {
         },
         loginUser: (_, { email, password }, headers) => {
             if (EMAIL == email && PASSWORD == password) {
-                const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: '24h' });
+                const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: "24h" });
                 return { token };
             }
             else {
-                throw new Error('Invalid credentials');
+                throw new Error("Invalid credentials");
             }
         },
     },
     Subscription: {
         todoAdded: {
-            subscribe: () => pubsub.asyncIterator([TODO_ADDED])
+            subscribe: () => pubsub.asyncIterator([TODO_ADDED]),
         },
         todoUpdated: {
-            subscribe: () => pubsub.asyncIterator([TODO_UPDATED])
+            subscribe: () => pubsub.asyncIterator([TODO_UPDATED]),
         },
         todoDeleted: {
-            subscribe: () => pubsub.asyncIterator([TODO_DELETED])
-        }
-    }
+            subscribe: () => pubsub.asyncIterator([TODO_DELETED]),
+        },
+    },
 };
